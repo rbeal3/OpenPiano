@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+	 <script src="./numberpadPiano.js" type="text/javascript"></script>
+  	 <script src="./MidiMaster/js/MIDI/AudioDetect.js" type="text/javascript"></script>
+ <script src="./MidiMaster/js/MIDI/LoadPlugin.js" type="text/javascript"></script>
+ <script src="./MidiMaster/js/MIDI/Plugin.js" type="text/javascript"></script>
+ <script src="./MidiMaster/js/MIDI/Player.js" type="text/javascript"></script>
+ <script src="./MidiMaster/js/Window/DOMLoader.XMLHttp.js" type="text/javascript"></script>
+  <script src="./MidiMaster/inc/Base64.js" type="text/javascript"></script>
+ <script src="./MidiMaster/inc/base64binary.js" type="text/javascript"></script>
+
+
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas" width="1200" height=" 500"></canvas>
+    <script>
+      window.requestAnimFrame = (function(callback) {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+        function(callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+      })();
+      
+      var NOTES_IN_1_OCTAVE=7,
+      A=1, B=2, C=3, D=4, E=5, F=6, G=7;
+      var viewport = {
+        //set to reflect canvas variables
+        width: 1200,
+        height: 400
+      };
+      var white_key = {
+        width: 50,
+        height: 100
+      };
+      var black_key = {
+        width: 25,
+        height: 60
+      };
+      var piano = {
+        x: 0,
+        y: viewport.height,
+        octaves: 1
+      };
+
+      function drawPiano(context)
+      {
+        x=piano.x; 
+       //drawing white keys
+        while (x < piano.octaves*NOTES_IN_1_OCTAVE*white_key.width){
+          context.beginPath();
+          context.rect(x, piano.y, white_key.width, white_key.height);
+          context.fillStyle = '#DDEEFF';
+          context.fill();
+          context.lineWidth = myRectangle.borderWidth;
+          //onpress
+          context.strokeStyle = 'black';
+          context.stroke();
+          x+= white_key.width;
+        } 
+       //drawing black keys
+       //none between bc ef
+        x = piano.x + black_key.width*1.5;//this lines up black keys
+        var note=B;
+        while (x < piano.octaves*NOTES_IN_1_OCTAVE*white_key.width){
+          if (note<=G){
+            note++;
+          }
+          else{
+            note=B;
+          }
+
+          if(note!=B && note!=E){
+            context.beginPath();
+            context.rect(x, piano.y, black_key.width, black_key.height);
+            context.fillStyle = '#223344';
+            context.fill();
+            context.lineWidth = myRectangle.borderWidth;
+            //onpress
+            context.strokeStyle = 'black';
+            context.stroke();
+          }
+            x+= white_key.width;
+        }
+      }
+      var myRectangle = {
+        x: 100,
+        y: 05,
+        width: 50,
+        height: 150,
+        borderWidth: 5
+      };
+      
+      function drawNotes(myRectangle, context) {
+        context.beginPath();
+        context.rect(myRectangle.x, myRectangle.y, myRectangle.width, myRectangle.height);
+        context.fillStyle = '#8ED6FF';
+        context.fill();
+        context.lineWidth = myRectangle.borderWidth;
+        context.strokeStyle = 'black';
+        context.stroke();
+      }
+      //this block runs every frame
+      function animate(myRectangle, canvas, context, startTime) {
+        // update
+        var time = (new Date()).getTime() - startTime;
+
+        var linearSpeed = 100;
+        // pixels / second
+        var newY = linearSpeed * time / 1000;
+
+        if(newY < canvas.height - myRectangle.height - myRectangle.borderWidth / 2) {
+          myRectangle.y = newY;
+        }
+
+        // clear  
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawNotes(myRectangle, context);
+        drawPiano(context);
+
+
+        // request new frame
+        requestAnimFrame(function() {
+          animate(myRectangle, canvas, context, startTime);
+        });
+      }
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+
+
+      // wait one second before starting animation
+      setTimeout(function() {
+        var startTime = (new Date()).getTime();
+        animate(myRectangle, canvas, context, startTime);
+      }, 1000);
+    </script>
+  </body>
+</html>      
